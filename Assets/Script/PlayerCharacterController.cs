@@ -18,9 +18,11 @@ public class PlayerCharacterController : MonoBehaviour
 
     [HideInInspector]
     public bool canMove = true;
-
+    [SerializeField]
     Animator animator;
 
+    float inputx;
+    float inputz;
 
     // Start is called before the first frame update
     void Start()
@@ -35,6 +37,9 @@ public class PlayerCharacterController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        inputx = Input.GetAxis("Horizontal");
+        inputz = Input.GetAxis("Vertical");
+        //Debug.Log($"{inputx},{inputz}");
         // We are grounded, so recalculate move direction based on axes
         Vector3 forward = transform.TransformDirection(Vector3.forward);
         Vector3 right = transform.TransformDirection(Vector3.right);
@@ -83,13 +88,12 @@ public class PlayerCharacterController : MonoBehaviour
     }
     private void LateUpdate()
     {
-        float _x = characterController.velocity.x;
-        float _z = characterController.velocity.z;
+        
 
-        if (_x>0f || _z > 0f)
+        if (inputx != 0f || inputz != 0f)
         {
-            animator.SetFloat("Horizontal", _x);
-            animator.SetFloat("Vertical", _z);
+            animator.SetFloat("Horizontal", inputx);
+            animator.SetFloat("Vertical", inputz);
         }
     }
 }
