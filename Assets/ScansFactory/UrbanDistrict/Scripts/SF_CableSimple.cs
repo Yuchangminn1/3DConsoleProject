@@ -70,13 +70,13 @@ namespace SF_CableSimple
             RotateAndScaleCableMesh();
         }
 
-        private void OnValidate()
-        {
-            if (!Application.isPlaying)
-            {
-                propertiesChanged = true;
-            }
-        }
+        //private void OnValidate()
+        //{
+        //    if (!Application.isPlaying)
+        //    {
+        //        propertiesChanged = true;
+        //    }
+        //}
         
         private void SetEndPointFromElectricPole()
         {

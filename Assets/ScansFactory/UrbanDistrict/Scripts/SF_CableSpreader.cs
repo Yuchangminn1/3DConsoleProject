@@ -109,13 +109,13 @@ namespace SF_CableSpreader
             RotateAndScaleCableMesh();
         }
 
-        private void OnValidate()
-        {
-            if (!Application.isPlaying)
-            {
-                propertiesChanged = true;
-            }
-        }
+        //private void OnValidate()
+        //{
+        //    if (!Application.isPlaying)
+        //    {
+        //        propertiesChanged = true;
+        //    }
+        //}
         
         private void SetEndPointFromElectricPole()
         {
