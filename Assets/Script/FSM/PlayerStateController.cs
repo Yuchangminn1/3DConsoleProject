@@ -23,7 +23,7 @@ public class PlayerStateController : MonoBehaviour
 
     public bool isRunning { get; set; }
 
-    Animator animator;
+    public Animator animator;
     CharacterController characterController;
 
     Vector3 moveDirection = Vector3.zero;
@@ -35,16 +35,21 @@ public class PlayerStateController : MonoBehaviour
     float lookSpeed = 0.1f;
     float lookXLimit = 45.0f;
     float rotationX = 0;
-
+    float groundCheckDis = 0.3f;
     public bool jumpButton;
 
     Vector3 nextFixedPosition;
     Vector3 lastFixedPosition;
-
-
+    [SerializeField]
+    LayerMask ground;
+    [SerializeField]
+    bool isGround;
     // Start is called before the first frame update
     void Start()
     {
+        animator = GetComponentInChildren<Animator>();
+        characterController = GetComponent<CharacterController>();
+
         stateMachine = new StateMachine();
         moveState = new MoveState(this, 0);
         jumpState = new JumpState(this, 1);
@@ -55,8 +60,6 @@ public class PlayerStateController : MonoBehaviour
         lastFixedPosition = transform.position;
 
 
-        characterController = GetComponent<CharacterController>();
-        animator = GetComponentInChildren<Animator>();
 
         //커서 안보이고 잠금
         Cursor.lockState = CursorLockMode.Locked;
@@ -66,18 +69,34 @@ public class PlayerStateController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        stateMachine.Update();
         if (UnityEngine.Input.GetKeyDown(KeyCode.C))
         {
             //움직임 막기 테스트용
             canMove = !canMove;
             Debug.Log($"C {canMove}");
         }
-
         characterController.Move(Vector3.Lerp(lastFixedPosition,nextFixedPosition, 0.1f)-transform.position);
-
+    }
+    private void OnDrawGizmos()
+    {
+        Vector3 tmp = transform.position;
+        tmp.y += groundCheckDis / 2f;
+        Gizmos.DrawRay(tmp, Vector3.down * groundCheckDis);
+    }
+    public void GroundCheck()
+    {
+         isGround = Physics.Raycast(transform.position,Vector3.down , groundCheckDis, ground);
+    }
+    public bool GetIsGruond()
+    {
+        return isGround;
     }
     private void FixedUpdate()
     {
+        GroundCheck();
+        stateMachine.FixedUpdate();
+
         if (canMove)
         {
             //xz축 움직임 
@@ -87,11 +106,11 @@ public class PlayerStateController : MonoBehaviour
             float curSpeedY = canMove ? (isRunning ? runningSpeed : walkingSpeed) * moveInput.x : 0;
             moveDirection = (transform.forward * curSpeedX) + (transform.right * curSpeedY);
             moveDirection.y = characterController.velocity.y;
-            if (!characterController.isGrounded)
+            if (!isGround)
             {
                 moveDirection.y -= gravity * Time.deltaTime;
             }
-            if (characterController.isGrounded&&jumpButton)
+            if (isGround && jumpButton)
             {
                 moveDirection.y = jumpSpeed;
                 jumpButton = false;
@@ -121,6 +140,8 @@ public class PlayerStateController : MonoBehaviour
     }
     private void LateUpdate()
     {
+        stateMachine.LateUpdate();
+
         //xz 인풋 애니메이션 
         if (isRunning && moveInput.y > 0)
         {
@@ -145,8 +166,9 @@ public class PlayerStateController : MonoBehaviour
     {
         stateMachine.ChangState(_newState);
     }
-    public bool playerIsGround()
+    
+    public void SetState(int _num)
     {
-        return characterController.isGrounded;
+        animator.SetInteger("State", _num);
     }
 }

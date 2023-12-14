@@ -8,6 +8,8 @@ public class FallState : PlayerState
     {
         player = _player;
         stateNum = _stateNum;
+        ableFly = true;
+
     }
 
     public override void Enter()
@@ -21,7 +23,10 @@ public class FallState : PlayerState
     public override void LateUpdate()
     {
         base.LateUpdate();
-        
+        if (player.GetIsGruond())
+        {
+            player.ChangeState(player.moveState);
+        }
     }
     public override void FixedUpdate()
     {

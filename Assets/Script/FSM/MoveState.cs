@@ -21,6 +21,7 @@ public class MoveState : PlayerState
     public override void LateUpdate()
     {
         base.LateUpdate();
+        
     }
     public override void FixedUpdate()
     {

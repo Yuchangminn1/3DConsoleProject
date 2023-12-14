@@ -14,7 +14,8 @@ public class PlayerState
     }
     public virtual void Enter()
     {
-
+        player.SetState(stateNum);
+        Debug.Log("Enter");
     }
     public virtual void Update()
     {
@@ -28,7 +29,10 @@ public class PlayerState
     {
         if (!ableFly)
         {
-            player.ChangeState(player.fallState);
+            if (!player.GetIsGruond())
+            {
+                player.ChangeState(player.fallState);
+            }
         }
     }
     public virtual void Exit()

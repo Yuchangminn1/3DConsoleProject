@@ -8,6 +8,7 @@ public class JumpState : PlayerState
     {
         player = _player;
         stateNum = _stateNum;
+        ableFly = true;
     }
 
     public override void Enter()
