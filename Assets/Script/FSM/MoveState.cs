@@ -21,7 +21,10 @@ public class MoveState : PlayerState
     public override void LateUpdate()
     {
         base.LateUpdate();
-        
+        if (player.jumpButton)
+        {
+            player.ChangeState(player.jumpState);
+        }
     }
     public override void FixedUpdate()
     {

@@ -14,6 +14,7 @@ public class JumpState : PlayerState
     public override void Enter()
     {
         base.Enter();
+        player.AnimationTriggerON();
     }
     public override void Update()
     {
@@ -21,7 +22,22 @@ public class JumpState : PlayerState
     }
     public override void LateUpdate()
     {
+
+        if (player.AnimationTrigger())
+        {
+            return;
+        }
+        //애니메이션트리거 후 변경할려고 
         base.LateUpdate();
+
+        if (player.GetIsGruond())
+        {
+            player.ChangeState(player.moveState);
+        }
+        else
+        {
+            player.ChangeState(player.fallState);
+        }
     }
     public override void FixedUpdate()
     {

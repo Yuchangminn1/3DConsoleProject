@@ -1,8 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.InteropServices.WindowsRuntime;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 using UnityEngine.Windows;
 
 public class PlayerStateController : MonoBehaviour
@@ -18,12 +20,20 @@ public class PlayerStateController : MonoBehaviour
 
     public Camera playerCamera;
     public GameObject flashlightHolder;
+    public Animator animator;
 
     public bool canMove = true;
 
-    public bool isRunning { get; set; }
+    private bool _isRunning = false;
+    public bool IsRunning { get { return _isRunning; } set { _isRunning = value; } }
+    public bool jumpButton { get; set; }
 
-    public Animator animator;
+    public bool mouseLButton { get; set; }
+
+    public bool mouseRButton { get; set; }
+
+
+
     CharacterController characterController;
 
     Vector3 moveDirection = Vector3.zero;
@@ -36,7 +46,12 @@ public class PlayerStateController : MonoBehaviour
     float lookXLimit = 45.0f;
     float rotationX = 0;
     float groundCheckDis = 0.3f;
-    public bool jumpButton;
+
+    //public bool mouseButtonL { get; set; }
+    //public bool mouseButtonR { get; set; }
+
+    public List<GameObject> equip;
+    public GameObject currentEquip;
 
     Vector3 nextFixedPosition;
     Vector3 lastFixedPosition;
@@ -44,7 +59,20 @@ public class PlayerStateController : MonoBehaviour
     LayerMask ground;
     [SerializeField]
     bool isGround;
+
+    bool animationTrigger {get; set;}
+    [SerializeField]
+    private InputActionReference moveI, mousemoveI;
     // Start is called before the first frame update
+
+    private void Awake()
+    {
+        foreach(GameObject goj in equip)
+        {
+            goj.SetActive(false);
+        }
+    }
+
     void Start()
     {
         animator = GetComponentInChildren<Animator>();
@@ -59,16 +87,54 @@ public class PlayerStateController : MonoBehaviour
         nextFixedPosition =transform.position;
         lastFixedPosition = transform.position;
 
-
+        ChangeEquip();
 
         //커서 안보이고 잠금
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
-
+    public void ChangeEquip(int _num = 4)
+    {
+        if(_num >= equip.Count)
+        {
+            //무기 수 부족하면 처리 
+            return;
+        }
+        Debug.Log($"player ChangeEquip{_num}");
+        //키보드 5번은 주먹 빈손
+        if (currentEquip == null)
+        {
+            currentEquip = equip[_num];
+            return;
+        }
+        //무기 체인지 
+        if (currentEquip != equip[_num])
+        {
+            currentEquip.SetActive(false);
+            currentEquip = equip[_num];
+            currentEquip.SetActive(true);
+            animator.SetInteger("Weapon", _num);
+        }
+    }
+    public void AnimationTriggerON()
+    {
+        animationTrigger = true;
+    }
+    public void AnimationTriggerOFF()
+    {
+        animationTrigger = false;
+    }
+    public bool AnimationTrigger()
+    {
+        return animationTrigger;
+    }
     // Update is called once per frame
     void Update()
     {
+        moveInput = moveI.action.ReadValue<Vector2>();
+        mouseInput = mousemoveI.action.ReadValue<Vector2>();
+        //Debug.Log(runI.action.ReadValueAsObject());
+
         stateMachine.Update();
         if (UnityEngine.Input.GetKeyDown(KeyCode.C))
         {
@@ -102,8 +168,8 @@ public class PlayerStateController : MonoBehaviour
             //xz축 움직임 
             lastFixedPosition = nextFixedPosition;
 
-            float curSpeedX = canMove ? (isRunning ? runningSpeed : walkingSpeed) * moveInput.y : 0;
-            float curSpeedY = canMove ? (isRunning ? runningSpeed : walkingSpeed) * moveInput.x : 0;
+            float curSpeedX = canMove ? (IsRunning ? runningSpeed : walkingSpeed) * moveInput.y : 0;
+            float curSpeedY = canMove ? (IsRunning ? runningSpeed : walkingSpeed) * moveInput.x : 0;
             moveDirection = (transform.forward * curSpeedX) + (transform.right * curSpeedY);
             moveDirection.y = characterController.velocity.y;
             if (!isGround)
@@ -112,6 +178,7 @@ public class PlayerStateController : MonoBehaviour
             }
             if (isGround && jumpButton)
             {
+                stateMachine.LateUpdate();
                 moveDirection.y = jumpSpeed;
                 jumpButton = false;
             }
@@ -143,7 +210,7 @@ public class PlayerStateController : MonoBehaviour
         stateMachine.LateUpdate();
 
         //xz 인풋 애니메이션 
-        if (isRunning && moveInput.y > 0)
+        if (IsRunning && moveInput.y > 0)
         {
             animator.SetFloat("Vertical", 2f);
         }
@@ -170,5 +237,10 @@ public class PlayerStateController : MonoBehaviour
     public void SetState(int _num)
     {
         animator.SetInteger("State", _num);
+    }
+
+    public void ToggleFlashlight()
+    {
+        flashlightHolder.SetActive(!flashlightHolder.activeSelf);
     }
 }
