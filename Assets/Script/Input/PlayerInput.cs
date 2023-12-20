@@ -2,8 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.Windows;
-using static Unity.Collections.Unicode;
 public class PlayerInput : MonoBehaviour
 {
     PlayerStateController player;
@@ -31,22 +29,22 @@ public class PlayerInput : MonoBehaviour
         flashlight.action.started += ctx => OnFlashlightStarted();
 
         mouseButtonL.action.Enable();
-        mouseButtonL.action.started += ctx => OnFlashlightStarted();
+        mouseButtonL.action.started += ctx => OnMouseLStarted();
 
         mouseButtonR.action.Enable();
-        mouseButtonR.action.started += ctx => OnFlashlightStarted();
-
+        mouseButtonR.action.started += ctx => OnMouseRStarted();
+        mouseButtonR.action.canceled += ctx => ONMouseRCanceled();
 
 
         for (int i = 0; i < equip.Length; i++)
         {
             equip[i].action.Enable();
         }
-        equip[0].action.started += ctx => OnChangeEquip(0);
-        equip[1].action.started += ctx => OnChangeEquip(1);
-        equip[2].action.started += ctx => OnChangeEquip(2);
-        equip[3].action.started += ctx => OnChangeEquip(3);
-        equip[4].action.started += ctx => OnChangeEquip(4);
+        equip[0].action.started += ctx => OnChangeEquipment(0);
+        equip[1].action.started += ctx => OnChangeEquipment(1);
+        equip[2].action.started += ctx => OnChangeEquipment(2);
+        equip[3].action.started += ctx => OnChangeEquipment(3);
+        equip[4].action.started += ctx => OnChangeEquipment(4);
 
 
     }
@@ -71,16 +69,21 @@ public class PlayerInput : MonoBehaviour
     }
     private void OnMouseLStarted()
     {
-        player.mouseLButton = true;
+        Debug.Log("마우스 왼쪽 클릭");
+        player.FireWeapon();
     }
     private void OnMouseRStarted()
     {
-        player.mouseRButton = true;
+        player.OnAim();
     }
-    private void OnChangeEquip(int _num)
+    private void ONMouseRCanceled()
+    {
+        player.OffAim();
+    }
+    private void OnChangeEquipment(int _num)
     {
         Debug.Log(_num);
-        player.ChangeEquip(_num);
+        player.ChangeEquipment(_num);
     }
 }
 

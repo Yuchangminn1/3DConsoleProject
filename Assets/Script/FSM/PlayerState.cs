@@ -29,7 +29,7 @@ public class PlayerState
     {
         if (!ableFly)
         {
-            if (!player.GetIsGruond())
+            if (!player.GetIsGround())
             {
                 player.ChangeState(player.fallState);
             }

@@ -6,8 +6,8 @@ public class JumpState : PlayerState
 {
     public JumpState(PlayerStateController _player, int _stateNum) : base(_player, _stateNum)
     {
-        player = _player;
-        stateNum = _stateNum;
+        //player = _player;
+        //stateNum = _stateNum;
         ableFly = true;
     }
 
@@ -30,7 +30,7 @@ public class JumpState : PlayerState
         //애니메이션트리거 후 변경할려고 
         base.LateUpdate();
 
-        if (player.GetIsGruond())
+        if (player.GetIsGround())
         {
             player.ChangeState(player.moveState);
         }

@@ -6,8 +6,8 @@ public class MoveState : PlayerState
 {
     public MoveState(PlayerStateController _player, int _stateNum) : base(_player, _stateNum)
     {
-        player = _player;
-        stateNum = _stateNum;
+        //player = _player;
+        //stateNum = _stateNum;
     }
 
     public override void Enter()
@@ -17,6 +17,7 @@ public class MoveState : PlayerState
     public override void Update()
     {
         base.Update();
+
     }
     public override void LateUpdate()
     {

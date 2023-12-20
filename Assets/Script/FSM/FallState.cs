@@ -23,7 +23,7 @@ public class FallState : PlayerState
     public override void LateUpdate()
     {
         base.LateUpdate();
-        if (player.GetIsGruond())
+        if (player.GetIsGround())
         {
             player.ChangeState(player.moveState);
         }
